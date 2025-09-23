@@ -60,19 +60,10 @@ body {
     overflow-x: hidden;
   }
   
-  /* Arreglar espaciado del LogoLoop en móvil */
-  .overflow-hidden.group {
-    padding: 0 1rem;
-  }
-  
-  /* Aumentar gap entre logos en móvil */
-  .overflow-hidden.group [role="list"] {
-    gap: 2rem;
-  }
-  
-  /* Asegurar que los logos tengan espacio adecuado */
-  .overflow-hidden.group img {
-    margin-right: 2rem;
+  /* Mejorar espaciado general en móvil */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 

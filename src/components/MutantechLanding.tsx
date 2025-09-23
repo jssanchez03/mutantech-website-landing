@@ -646,17 +646,17 @@ const MutantechLanding = () => {
           </div>
           
           <div className="relative" data-aos="fade-up" data-aos-delay="200">
-            <div className="h-32 relative overflow-hidden rounded-lg">
+            <div className={`${isMobile ? 'h-24' : 'h-32'} relative overflow-hidden rounded-lg ${isMobile ? 'px-2' : ''}`}>
               <LogoLoop
                 logos={getAdditionalTechnologyLogos()}
-                speed={50}
+                speed={isMobile ? 40 : 50}
                 direction="left"
-                logoHeight={isMobile ? 40 : 56}
-                gap={isMobile ? 80 : 56}
+                logoHeight={isMobile ? 36 : 56}
+                gap={isMobile ? 64 : 56}
                 pauseOnHover={true}
-                fadeOut={true}
+                fadeOut={!isMobile}
                 fadeOutColor={isDarkMode ? '#111827' : '#f9fafb'}
-                scaleOnHover={true}
+                scaleOnHover={!isMobile}
                 ariaLabel="Tecnologías adicionales que utilizamos"
                 className="h-full"
               />
@@ -815,25 +815,24 @@ const MutantechLanding = () => {
               </div>
             ) : (
               // Vista Móvil - Dos carpetas separadas por responsabilidades
-              <div className="relative w-full flex flex-col items-center justify-center space-y-6 px-4 mt-16" data-aos="fade-left">
+              <div className="relative w-full flex flex-col items-center justify-center space-y-12 px-4 mt-24" data-aos="fade-left">
                 {/* Texto descriptivo arriba */}
-                <div className="text-center mb-8">
-                  <h4 className="text-lg font-bold mb-2 text-green-500">Portafolios del Equipo</h4>
-                  <p className={`text-sm ${theme.textSecondary} mb-2`}>
-                    Explora los portafolios por área de especialización
-                  </p>
-                  <p className="text-xs text-green-400">
-                    • Verde: Disponible • Gris: Próximamente
+                <div className="text-center mb-16">
+                  <h4 className="text-2xl font-bold mb-4">
+                    Nuestro <span className="text-green-500">Equipo</span>
+                  </h4>
+                  <p className={`text-base ${theme.textSecondary} max-w-md mx-auto`}>
+                    Conoce a los profesionales que hacen posible cada proyecto
                   </p>
                 </div>
                 
                 {/* Carpeta Frontend & Design */}
-                <div className="flex flex-col items-center mb-8">
-                  <h5 className="text-md font-semibold mb-3 text-blue-400">Frontend & Design</h5>
+                <div className="flex flex-col items-center mb-16">
+                  <h5 className="text-lg font-semibold mb-8 text-blue-400">Frontend & Design</h5>
                   <Folder 
-                    size={1.0} 
+                    size={1.2} 
                     color="#3b82f6" 
-                    className="mb-4"
+                    className="mb-8"
                     items={[
                       // Jair Sánchez - Mobile Developer
                       <div 
@@ -921,11 +920,11 @@ const MutantechLanding = () => {
                 
                 {/* Carpeta Backend & QA */}
                 <div className="flex flex-col items-center">
-                  <h5 className="text-md font-semibold mb-3 text-purple-400">Backend & QA</h5>
+                  <h5 className="text-lg font-semibold mb-8 text-purple-400">Backend & QA</h5>
                   <Folder 
-                    size={1.0} 
+                    size={1.2} 
                     color="#8b5cf6" 
-                    className="mb-4"
+                    className="mb-8"
                     items={[
                       // Josué Espinoza - Backend Developer
                       <div 
