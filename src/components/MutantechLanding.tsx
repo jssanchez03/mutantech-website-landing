@@ -21,19 +21,50 @@ import {
   Moon
 } from 'lucide-react';
 import ContactForm from './ContactForm';
+import CardSwap, { Card } from './CardSwap';
 
 const MutantechLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  // Datos del equipo (corregidos los caracteres especiales)
+  // Datos del equipo con portafolios
   const team = [
-    { name: 'Josué Brazales', role: 'Ingeniero ITIN', specialty: 'QA Tester' },
-    { name: 'Jair Sánchez', role: 'Ingeniero ITIN', specialty: 'Mobile Developer' },
-    { name: 'Josué Espinoza', role: 'Ingeniero ITIN', specialty: 'Backend Developer' },
-    { name: 'Raúl Faz', role: 'Ingeniero ITIN', specialty: 'Frontend Developer' },
-    { name: 'Lesly Gaibor', role: 'Ingeniera ITIN', specialty: 'UI/UX Designer' }
+    { 
+      name: 'Josué Brazales', 
+      role: 'Ingeniero de TI', 
+      specialty: 'QA Tester',
+      portfolio: '#', // Pendiente
+      image: 'https://via.placeholder.com/300x400/1f2937/10b981?text=Josué+B' // Placeholder temporal
+    },
+    { 
+      name: 'Jair Sánchez', 
+      role: 'Ingeniero de TI', 
+      specialty: 'Mobile Developer',
+      portfolio: 'https://jairsanchez.vercel.app/',
+      image: 'https://res.cloudinary.com/dq8at3uoc/image/upload/v1758655291/Captura_de_pantalla_2025-09-23_142043_homyjo.png'
+    },
+    { 
+      name: 'Josué Espinoza', 
+      role: 'Ingeniero de TI', 
+      specialty: 'Backend Developer',
+      portfolio: 'https://josueespinoza.netlify.app/',
+      image: 'https://res.cloudinary.com/dq8at3uoc/image/upload/v1758655338/Captura_de_pantalla_2025-09-23_142201_kjshwg.png'
+    },
+    { 
+      name: 'Raúl Faz', 
+      role: 'Ingeniero de TI', 
+      specialty: 'Frontend Developer',
+      portfolio: '#', // Pendiente
+      image: 'https://via.placeholder.com/300x400/1f2937/10b981?text=Raúl+F' // Placeholder temporal
+    },
+    { 
+      name: 'Lesly Gaibor', 
+      role: 'Ingeniera de TI', 
+      specialty: 'UI/UX Designer',
+      portfolio: 'https://portafolio-lesly.netlify.app/',
+      image: 'https://res.cloudinary.com/dq8at3uoc/image/upload/v1758655405/Captura_de_pantalla_2025-09-23_142257_fysxkt.png'
+    }
   ];
 
   // Servicios
@@ -117,7 +148,7 @@ const MutantechLanding = () => {
     });
 
     const handleScroll = () => {
-      const sections = ['inicio', 'servicios', 'nosotros', 'equipo', 'contacto'];
+      const sections = ['inicio', 'servicios', 'nosotros', 'equipo', 'portafolios', 'contacto'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -141,7 +172,13 @@ const MutantechLanding = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const headerHeight = 80; // Altura del header fijo
+      const elementPosition = element.offsetTop - headerHeight;
+      
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
     }
     setIsMenuOpen(false);
   };
@@ -287,7 +324,7 @@ const MutantechLanding = () => {
             
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              {['Inicio', 'Servicios', 'Nosotros', 'Equipo', 'Contacto'].map((item) => (
+              {['Inicio', 'Servicios', 'Nosotros', 'Equipo', 'Portafolios', 'Contacto'].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
@@ -329,7 +366,7 @@ const MutantechLanding = () => {
           {/* Mobile Menu */}
           {isMenuOpen && (
             <div className={`md:hidden mt-4 py-4 ${theme.bgSecondary} rounded-lg`}>
-              {['Inicio', 'Servicios', 'Nosotros', 'Equipo', 'Contacto'].map((item) => (
+              {['Inicio', 'Servicios', 'Nosotros', 'Equipo', 'Portafolios', 'Contacto'].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
@@ -402,7 +439,7 @@ const MutantechLanding = () => {
       </section>
 
       {/* Services Section */}
-      <section id="servicios" className={`py-20 ${theme.bgSecondary} transition-colors duration-300`}>
+      <section id="servicios" className={`py-32 ${theme.bgSecondary} transition-colors duration-300`}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -441,7 +478,7 @@ const MutantechLanding = () => {
       </section>
 
       {/* About Section */}
-      <section id="nosotros" className={`py-20 ${theme.bg} transition-colors duration-300`}>
+      <section id="nosotros" className={`py-32 ${theme.bg} transition-colors duration-300`}>
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div data-aos="fade-right">
@@ -484,7 +521,7 @@ const MutantechLanding = () => {
       </section>
 
       {/* Team Section */}
-      <section id="equipo" className={`py-20 ${theme.bgSecondary} transition-colors duration-300`}>
+      <section id="equipo" className={`py-32 ${theme.bgSecondary} transition-colors duration-300`}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -515,8 +552,150 @@ const MutantechLanding = () => {
         </div>
       </section>
 
+      {/* Portfolio Section */}
+      <section id="portafolios" className={`py-32 ${theme.bg} transition-colors duration-300 relative overflow-hidden`}>
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Contenido de texto */}
+            <div data-aos="fade-right">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Conoce Nuestros <span className="text-green-500">Portafolios</span>
+              </h2>
+              <p className={`text-lg ${theme.textSecondary} mb-8`}>
+                Cada miembro de nuestro equipo tiene su propio portafolio donde puedes ver 
+                sus proyectos, habilidades y experiencia. Haz clic en las tarjetas para 
+                explorar el trabajo individual de cada desarrollador.
+              </p>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className={theme.textSecondary}>Proyectos personales y profesionales</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className={theme.textSecondary}>Tecnologías y herramientas utilizadas</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className={theme.textSecondary}>Experiencia y especialización</span>
+                </div>
+              </div>
+
+              {/* Acceso rápido a portafolios */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold mb-4">Acceso Rápido:</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3 gap-3">
+                  {team.map((member, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        if (member.portfolio && member.portfolio !== '#') {
+                          window.open(member.portfolio, '_blank');
+                        }
+                      }}
+                      disabled={member.portfolio === '#'}
+                      className={`
+                        flex items-center gap-3 p-3 rounded-lg transition-all duration-300 text-left
+                        ${member.portfolio !== '#' 
+                          ? `${theme.card} ${theme.cardHover} cursor-pointer hover:scale-105` 
+                          : `${theme.card} opacity-50 cursor-not-allowed`
+                        }
+                      `}
+                    >
+                      <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Users className="w-5 h-5 text-green-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{member.name}</p>
+                        <p className="text-xs text-green-500 truncate">{member.specialty}</p>
+                      </div>
+                      {member.portfolio !== '#' && (
+                        <ArrowRight className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      )}
+                      {member.portfolio === '#' && (
+                        <span className="text-xs text-gray-500 flex-shrink-0">Próximamente</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Tarjetas animadas */}
+            <div className="relative h-[700px] w-full flex items-center justify-center" data-aos="fade-left">
+              {/* Indicador de scroll */}
+              <div className="absolute top-4 right-4 z-10 bg-green-500/20 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-green-400 border border-green-500/30">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-green-500 rounded-full flex items-center justify-center">
+                    <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                  </div>
+                  <span>Usa scroll para navegar</span>
+                </div>
+              </div>
+              
+              <CardSwap
+                cardDistance={30}
+                verticalDistance={40}
+                delay={5000}
+                pauseOnHover={true}
+                onCardClick={(index) => {
+                  const member = team[index];
+                  if (member.portfolio && member.portfolio !== '#') {
+                    window.open(member.portfolio, '_blank');
+                  }
+                }}
+              >
+                {team.map((member, index) => (
+                  <Card key={index} className="cursor-pointer group">
+                    <div className="relative w-full h-full overflow-hidden rounded-xl">
+                      {/* Imagen de fondo */}
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
+                        style={{ 
+                          backgroundImage: `url(${member.image})`,
+                          filter: 'brightness(0.8)'
+                        }}
+                      />
+                      
+                      {/* Overlay con gradiente */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                      
+                      {/* Contenido */}
+                      <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                        <div className="transform transition-transform duration-300 group-hover:translate-y-[-10px]">
+                          <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
+                          <p className="text-green-400 font-semibold mb-1">{member.specialty}</p>
+                          <p className="text-gray-300 text-sm mb-4">{member.role}</p>
+                          
+                          {member.portfolio !== '#' && (
+                            <div className="flex items-center gap-2 text-green-400 text-sm">
+                              <ArrowRight className="w-4 h-4" />
+                              <span>Ver portafolio</span>
+                            </div>
+                          )}
+                          
+                          {member.portfolio === '#' && (
+                            <div className="text-gray-400 text-sm">
+                              <span>Portafolio próximamente</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Efecto de brillo en hover */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                    </div>
+                  </Card>
+                ))}
+              </CardSwap>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
-      <section id="contacto" className={`py-20 ${theme.bg} transition-colors duration-300`}>
+      <section id="contacto" className={`py-32 ${theme.bgSecondary} transition-colors duration-300`}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -575,7 +754,7 @@ const MutantechLanding = () => {
       </section>
 
       {/* Footer */}
-      <footer className={`py-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} border-t border-green-500/30 transition-colors duration-300`}>
+      <footer className={`py-8 ${theme.bg} border-t border-green-500/30 transition-colors duration-300`}>
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
             <Code className="w-6 h-6 text-green-500" />
