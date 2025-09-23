@@ -110,13 +110,19 @@ const CardSwap: React.FC<CardSwapProps> = ({
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const container = useRef<HTMLDivElement>(null);
+  
+  // Estados para controlar el scroll
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const scrollDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     const total = refs.length;
     refs.forEach((r, i) => placeNow(r.current!, makeSlot(i, cardDistance, verticalDistance, total), skewAmount));
 
     const swap = () => {
-      if (order.current.length < 2) return;
+      // No hacer swap si estamos en modo scroll
+      if (isScrollingRef.current || order.current.length < 2) return;
 
       const [front, ...rest] = order.current;
       const elFront = refs[front].current!;
@@ -173,28 +179,26 @@ const CardSwap: React.FC<CardSwapProps> = ({
       });
     };
 
-    swap();
-    intervalRef.current = window.setInterval(swap, delay);
-
-    // Control manual con scroll del mouse
-    const node = container.current!;
-    let scrollTimeout: ReturnType<typeof setTimeout>;
-    let isScrolling = false;
-    
+    // Función mejorada para swap rápido con scroll
     const quickSwap = () => {
-      if (order.current.length < 2 || isScrolling) return;
+      if (order.current.length < 2) return;
       
-      isScrolling = true;
       const [front, ...rest] = order.current;
       
-      // Animación rápida y directa sin el efecto de caída
+      // Matar cualquier animación en curso
+      if (tlRef.current) {
+        tlRef.current.kill();
+        tlRef.current = null;
+      }
+      
       const tl = gsap.timeline({
         onComplete: () => {
-          isScrolling = false;
+          // Actualizar orden después de completar la animación
+          order.current = [...rest, front];
         }
       });
       
-      // Mover todas las cartas directamente a sus nuevas posiciones
+      // Animar todas las cartas de forma simultánea y rápida
       rest.forEach((idx, i) => {
         const el = refs[idx].current!;
         const slot = makeSlot(i, cardDistance, verticalDistance, refs.length);
@@ -203,12 +207,12 @@ const CardSwap: React.FC<CardSwapProps> = ({
           y: slot.y,
           z: slot.z,
           zIndex: slot.zIndex,
-          duration: 0.6,
+          duration: 0.4,
           ease: 'power2.out'
         }, 0);
       });
       
-      // Mover la carta frontal al final
+      // Mover la carta frontal directamente al final SIN animación de caída
       const frontEl = refs[front].current!;
       const backSlot = makeSlot(refs.length - 1, cardDistance, verticalDistance, refs.length);
       tl.to(frontEl, {
@@ -216,44 +220,80 @@ const CardSwap: React.FC<CardSwapProps> = ({
         y: backSlot.y,
         z: backSlot.z,
         zIndex: backSlot.zIndex,
-        duration: 0.6,
+        duration: 0.4,
         ease: 'power2.out'
       }, 0);
-      
-      tl.call(() => {
-        order.current = [...rest, front];
-      });
     };
     
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       
-      // Pausar animación automática
-      tlRef.current?.pause();
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      
-      // Ejecutar swap rápido en la dirección del scroll
-      if (Math.abs(e.deltaY) > 10 && !isScrolling) {
-        quickSwap();
+      // Debounce el scroll para evitar múltiples ejecuciones
+      if (scrollDebounceRef.current) {
+        clearTimeout(scrollDebounceRef.current);
       }
       
-      // Reiniciar animación automática después de 3 segundos sin scroll
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        if (!isScrolling) {
-          intervalRef.current = window.setInterval(swap, delay);
+      scrollDebounceRef.current = setTimeout(() => {
+        // Solo procesar si el scroll es significativo
+        if (Math.abs(e.deltaY) > 20 && !isScrollingRef.current) {
+          isScrollingRef.current = true;
+          
+          // Detener animación automática
+          if (tlRef.current) {
+            tlRef.current.kill();
+            tlRef.current = null;
+          }
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = undefined;
+          }
+          
+          // Ejecutar swap rápido
+          quickSwap();
+          
+          // Resetear estado después de un breve delay
+          setTimeout(() => {
+            isScrollingRef.current = false;
+          }, 500);
         }
-      }, 3000);
+        
+        // Reiniciar animación automática después de inactividad
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+        
+        scrollTimeoutRef.current = setTimeout(() => {
+          if (!isScrollingRef.current && !intervalRef.current) {
+            intervalRef.current = window.setInterval(swap, delay);
+          }
+        }, 2000);
+      }, 50); // Debounce de 50ms
     };
+
+    // Inicializar
+    swap();
+    intervalRef.current = window.setInterval(swap, delay);
+
+    const node = container.current!;
 
     if (pauseOnHover) {
       const pause = () => {
-        tlRef.current?.pause();
-        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (tlRef.current) tlRef.current.pause();
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = undefined;
+        }
       };
+      
       const resume = () => {
-        tlRef.current?.play();
-        intervalRef.current = window.setInterval(swap, delay);
+        if (!isScrollingRef.current) {
+          if (tlRef.current && tlRef.current.paused()) {
+            tlRef.current.play();
+          }
+          if (!intervalRef.current) {
+            intervalRef.current = window.setInterval(swap, delay);
+          }
+        }
       };
       
       node.addEventListener('mouseenter', pause);
@@ -264,16 +304,20 @@ const CardSwap: React.FC<CardSwapProps> = ({
         node.removeEventListener('mouseenter', pause);
         node.removeEventListener('mouseleave', resume);
         node.removeEventListener('wheel', handleWheel);
-        clearTimeout(scrollTimeout);
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+        if (scrollDebounceRef.current) clearTimeout(scrollDebounceRef.current);
         if (intervalRef.current) clearInterval(intervalRef.current);
+        if (tlRef.current) tlRef.current.kill();
       };
     } else {
       node.addEventListener('wheel', handleWheel, { passive: false });
       
       return () => {
         node.removeEventListener('wheel', handleWheel);
-        clearTimeout(scrollTimeout);
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+        if (scrollDebounceRef.current) clearTimeout(scrollDebounceRef.current);
         if (intervalRef.current) clearInterval(intervalRef.current);
+        if (tlRef.current) tlRef.current.kill();
       };
     }
   }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, refs.length, config.durDrop, config.durMove, config.durReturn, config.ease, config.promoteOverlap, config.returnDelay]);

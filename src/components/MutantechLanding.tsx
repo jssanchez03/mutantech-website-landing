@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import ContactForm from './ContactForm';
 import CardSwap, { Card } from './CardSwap';
+import LogoLoop, { type LogoItem } from './LogoLoop';
 
 const MutantechLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -95,11 +96,77 @@ const MutantechLanding = () => {
     }
   ];
 
-  // Tecnologías
+  // Tecnologías principales
   const technologies = [
     'JavaScript', 'TypeScript', 'PHP', 'Java', 'Python', 'React', 'Node.js', 
     'Laravel', 'Spring Boot', 'MySQL', 'MongoDB', 'AWS', 'Docker'
   ];
+
+  // Estado para el tooltip de tecnología
+  const [hoveredTech, setHoveredTech] = useState<string | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  // Tecnologías adicionales con LogoLoop
+  const getAdditionalTechnologyLogos = (): LogoItem[] => {
+    const baseUrl = 'https://res.cloudinary.com/dq8at3uoc/image/upload';
+    
+    const additionalTechnologies = [
+      { name: 'JavaScript', src: `${baseUrl}/v1758658967/javascript_anvpik.svg`, alt: 'JavaScript' },
+      { name: 'TypeScript', src: `${baseUrl}/v1758658997/typescript_t62nnw.svg`, alt: 'TypeScript' },
+      { name: 'React', src: isDarkMode ? `${baseUrl}/v1758658987/React_dark_wnxmlp.svg` : `${baseUrl}/v1758658990/React_light_jgqoyv.svg`, alt: 'React' },
+      { name: 'Node.js', src: `${baseUrl}/v1758658975/nodejs_trtdbc.svg`, alt: 'Node.js' },
+      { name: 'PHP', src: isDarkMode ? `${baseUrl}/v1758658981/Php_dark_plaq8j.svg` : `${baseUrl}/v1758658982/Php_light_m16uti.svg`, alt: 'PHP' },
+      { name: 'Java', src: `${baseUrl}/v1758658967/java_zklgre.svg`, alt: 'Java' },
+      { name: 'Python', src: `${baseUrl}/v1758658986/python_pdzovh.svg`, alt: 'Python' },
+      { name: 'Laravel', src: `${baseUrl}/v1758658971/laravel_v65ajo.svg`, alt: 'Laravel' },
+      { name: 'Spring Boot', src: `${baseUrl}/v1758658993/spring_qmkbyj.svg`, alt: 'Spring Boot' },
+      { name: 'Express.js', src: isDarkMode ? `${baseUrl}/v1758658953/Express.js_dark_zmf6l6.svg` : `${baseUrl}/v1758658954/Express.js_light_q2xdde.svg`, alt: 'Express.js' },
+      { name: 'Flask', src: isDarkMode ? `${baseUrl}/v1758658957/Flask_dark_omrfjs.svg` : `${baseUrl}/v1758658958/Flask_light_akmpib.svg`, alt: 'Flask' },
+      { name: 'MySQL', src: `${baseUrl}/v1758658977/mysql_aoysh6.svg`, alt: 'MySQL' },
+      { name: 'MongoDB', src: `${baseUrl}/v1758658972/mongodb_svjgdf.svg`, alt: 'MongoDB' },
+      { name: 'PostgreSQL', src: `${baseUrl}/v1758658983/postgresql_v4pub1.svg`, alt: 'PostgreSQL' },
+      { name: 'SQL Server', src: `${baseUrl}/v1758658994/sql-server_lbmlae.svg`, alt: 'SQL Server' },
+      { name: 'Docker', src: `${baseUrl}/v1758658952/docker_ph406u.svg`, alt: 'Docker' },
+      { name: 'Git', src: `${baseUrl}/v1758658961/git_lfab3b.svg`, alt: 'Git' },
+      { name: 'GitHub', src: isDarkMode ? `${baseUrl}/v1758658962/GitHub_dark_qyqj4q.svg` : `${baseUrl}/v1758658964/GitHub_light_qzcxwe.svg`, alt: 'GitHub' },
+      { name: 'VS Code', src: `${baseUrl}/v1758659008/vscode_hfnjzg.svg`, alt: 'VS Code' },
+      { name: 'Figma', src: `${baseUrl}/v1758658956/figma_qgnrg8.svg`, alt: 'Figma' },
+      { name: 'Tailwind CSS', src: `${baseUrl}/v1758658995/tailwindcss_jttn4r.svg`, alt: 'Tailwind CSS' },
+      { name: 'Bootstrap', src: `${baseUrl}/v1758658947/bootstrap_of2rkf.svg`, alt: 'Bootstrap' },
+      { name: 'HTML5', src: `${baseUrl}/v1758658965/html5_o7degc.svg`, alt: 'HTML5' },
+      { name: 'CSS3', src: `${baseUrl}/v1758658949/css_old_qtdvg4.svg`, alt: 'CSS3' },
+      { name: 'Angular', src: `${baseUrl}/v1758658946/angular_gpqdyb.svg`, alt: 'Angular' },
+      { name: 'Flutter', src: `${baseUrl}/v1758658960/flutter_pfpv4x.svg`, alt: 'Flutter' },
+      { name: 'Dart', src: `${baseUrl}/v1758658950/dart_s3osol.svg`, alt: 'Dart' },
+      { name: 'Android', src: `${baseUrl}/v1758658945/android-icon_flenrr.svg`, alt: 'Android' },
+      { name: 'Vite', src: `${baseUrl}/v1758659006/vitejs_w3t0f4.svg`, alt: 'Vite' },
+      { name: 'Vercel', src: isDarkMode ? `${baseUrl}/v1758659003/Vercel_dark_g8pdja.svg` : `${baseUrl}/v1758659004/Vercel_light_xbbrtn.svg`, alt: 'Vercel' },
+      { name: 'Postman', src: `${baseUrl}/v1758658986/postman_h8ngia.svg`, alt: 'Postman' },
+      { name: 'NPM', src: `${baseUrl}/v1758658978/npm_rumf4p.svg`, alt: 'NPM' },
+      { name: 'JWT', src: `${baseUrl}/v1758658970/jwt_xrpiqh.svg`, alt: 'JWT' },
+      { name: 'Cloudinary', src: `${baseUrl}/v1758658948/cloudinary_gkpqok.svg`, alt: 'Cloudinary' },
+      { name: 'Canva', src: `${baseUrl}/v1758658948/canva_rftjed.svg`, alt: 'Canva' },
+      { name: 'Notion', src: `${baseUrl}/v1758658976/notion_helaep.svg`, alt: 'Notion' },
+      { name: 'UI/UX', src: isDarkMode ? `${baseUrl}/v1758658999/ui_dark_cdzrbp.svg` : `${baseUrl}/v1758659001/ui_light_thi24l.svg`, alt: 'UI/UX Design' }
+    ];
+
+    return additionalTechnologies.map((tech) => ({
+      src: tech.src,
+      alt: tech.alt,
+      title: tech.name,
+      onMouseEnter: (e: React.MouseEvent) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setTooltipPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.top - 10
+        });
+        setHoveredTech(tech.name);
+      },
+      onMouseLeave: () => {
+        setHoveredTech(null);
+      }
+    } as LogoItem));
+  };
 
   // Sistema de colores para ambos temas (corregido)
   const getThemeClasses = () => {
@@ -499,7 +566,7 @@ const MutantechLanding = () => {
                   <div className={theme.textMuted}>Ingenieros Expertos</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-500">13+</div>
+                  <div className="text-3xl font-bold text-green-500">35+</div>
                   <div className={theme.textMuted}>Tecnologías</div>
                 </div>
               </div>
@@ -552,10 +619,60 @@ const MutantechLanding = () => {
         </div>
       </section>
 
+      {/* Additional Technologies Section */}
+      <section className={`py-20 ${theme.bg} transition-colors duration-300`}>
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12" data-aos="fade-up">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Más <span className="text-green-500">Tecnologías</span>
+            </h2>
+            <p className={`text-lg ${theme.textSecondary} max-w-2xl mx-auto`}>
+              Explora todas las herramientas y tecnologías que dominamos para crear soluciones completas
+            </p>
+          </div>
+          
+          <div className="relative" data-aos="fade-up" data-aos-delay="200">
+            <div className="h-32 relative overflow-hidden rounded-lg">
+              <LogoLoop
+                logos={getAdditionalTechnologyLogos()}
+                speed={50}
+                direction="left"
+                logoHeight={56}
+                gap={56}
+                pauseOnHover={true}
+                fadeOut={true}
+                fadeOutColor={isDarkMode ? '#111827' : '#f9fafb'}
+                scaleOnHover={true}
+                ariaLabel="Tecnologías adicionales que utilizamos"
+                className="h-full"
+              />
+            </div>
+            
+            {/* Tooltip para mostrar nombre de tecnología */}
+            {hoveredTech && (
+              <div 
+                className={`fixed ${theme.bgSecondary} ${theme.text} px-3 py-2 rounded-lg text-sm font-medium z-50 shadow-xl border border-green-500/50 pointer-events-none transform -translate-x-1/2 -translate-y-full`}
+                style={{ 
+                  left: tooltipPosition.x,
+                  top: tooltipPosition.y - 8,
+                  transition: 'all 0.2s ease-out'
+                }}
+              >
+                <div className="text-center font-semibold">
+                  {hoveredTech}
+                </div>
+                <div className={`absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent`} 
+                     style={{ borderTopColor: isDarkMode ? '#374151' : '#ffffff' }}></div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Portfolio Section */}
       <section id="portafolios" className={`py-32 ${theme.bg} transition-colors duration-300 relative overflow-hidden`}>
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-start lg:items-center max-w-7xl mx-auto">
             {/* Contenido de texto */}
             <div data-aos="fade-right">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -623,17 +740,7 @@ const MutantechLanding = () => {
             </div>
 
             {/* Tarjetas animadas */}
-            <div className="relative h-[700px] w-full flex items-center justify-center" data-aos="fade-left">
-              {/* Indicador de scroll */}
-              <div className="absolute top-4 right-4 z-10 bg-green-500/20 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-green-400 border border-green-500/30">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-green-500 rounded-full flex items-center justify-center">
-                    <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
-                  </div>
-                  <span>Usa scroll para navegar</span>
-                </div>
-              </div>
-              
+            <div className="relative h-[600px] w-full flex items-center justify-center" data-aos="fade-left">
               <CardSwap
                 cardDistance={30}
                 verticalDistance={40}
