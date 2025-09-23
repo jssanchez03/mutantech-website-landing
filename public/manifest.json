@@ -1,0 +1,8 @@
+{
+  "short_name": "Mutantech",
+  "name": "Mutantech - Desarrollo de Software",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#00ff88",
+  "background_color": "#111827"
+}
