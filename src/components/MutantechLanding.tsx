@@ -23,11 +23,25 @@ import {
 import ContactForm from './ContactForm';
 import CardSwap, { Card } from './CardSwap';
 import LogoLoop, { type LogoItem } from './LogoLoop';
+import Folder from './Folder';
 
 const MutantechLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Hook para detectar si es móvil
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   // Datos del equipo con portafolios
   const team = [
@@ -637,8 +651,8 @@ const MutantechLanding = () => {
                 logos={getAdditionalTechnologyLogos()}
                 speed={50}
                 direction="left"
-                logoHeight={56}
-                gap={56}
+                logoHeight={isMobile ? 40 : 56}
+                gap={isMobile ? 80 : 56}
                 pauseOnHover={true}
                 fadeOut={true}
                 fadeOutColor={isDarkMode ? '#111827' : '#f9fafb'}
@@ -739,64 +753,248 @@ const MutantechLanding = () => {
               </div>
             </div>
 
-            {/* Tarjetas animadas */}
-            <div className="relative h-[600px] w-full flex items-center justify-center" data-aos="fade-left">
-              <CardSwap
-                cardDistance={30}
-                verticalDistance={40}
-                delay={5000}
-                pauseOnHover={true}
-                onCardClick={(index) => {
-                  const member = team[index];
-                  if (member.portfolio && member.portfolio !== '#') {
-                    window.open(member.portfolio, '_blank');
-                  }
-                }}
-              >
-                {team.map((member, index) => (
-                  <Card key={index} className="cursor-pointer group">
-                    <div className="relative w-full h-full overflow-hidden rounded-xl">
-                      {/* Imagen de fondo */}
+            {/* Tarjetas animadas - Condicional PC/Móvil */}
+            {!isMobile ? (
+              // Vista PC - CardSwap original
+              <div className="relative h-[600px] w-full flex items-center justify-center" data-aos="fade-left">
+                <CardSwap
+                  cardDistance={30}
+                  verticalDistance={40}
+                  delay={5000}
+                  pauseOnHover={true}
+                  onCardClick={(index) => {
+                    const member = team[index];
+                    if (member.portfolio && member.portfolio !== '#') {
+                      window.open(member.portfolio, '_blank');
+                    }
+                  }}
+                >
+                  {team.map((member, index) => (
+                    <Card key={index} className="cursor-pointer group">
+                      <div className="relative w-full h-full overflow-hidden rounded-xl">
+                        {/* Imagen de fondo */}
+                        <div 
+                          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
+                          style={{ 
+                            backgroundImage: `url(${member.image})`,
+                            filter: 'brightness(0.8)'
+                          }}
+                        />
+                        
+                        {/* Overlay con gradiente */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                        
+                        {/* Contenido */}
+                        <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                          <div className="transform transition-transform duration-300 group-hover:translate-y-[-10px]">
+                            <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
+                            <p className="text-green-400 font-semibold mb-1">{member.specialty}</p>
+                            <p className="text-gray-300 text-sm mb-4">{member.role}</p>
+                            
+                            {member.portfolio !== '#' && (
+                              <div className="flex items-center gap-2 text-green-400 text-sm">
+                                <ArrowRight className="w-4 h-4" />
+                                <span>Ver portafolio</span>
+                              </div>
+                            )}
+                            
+                            {member.portfolio === '#' && (
+                              <div className="text-gray-400 text-sm">
+                                <span>Portafolio próximamente</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Efecto de brillo en hover */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                      </div>
+                    </Card>
+                  ))}
+                </CardSwap>
+              </div>
+            ) : (
+              // Vista Móvil - Dos carpetas separadas por responsabilidades
+              <div className="relative w-full flex flex-col items-center justify-center space-y-6 px-4 mt-16" data-aos="fade-left">
+                {/* Texto descriptivo arriba */}
+                <div className="text-center mb-8">
+                  <h4 className="text-lg font-bold mb-2 text-green-500">Portafolios del Equipo</h4>
+                  <p className={`text-sm ${theme.textSecondary} mb-2`}>
+                    Explora los portafolios por área de especialización
+                  </p>
+                  <p className="text-xs text-green-400">
+                    • Verde: Disponible • Gris: Próximamente
+                  </p>
+                </div>
+                
+                {/* Carpeta Frontend & Design */}
+                <div className="flex flex-col items-center mb-8">
+                  <h5 className="text-md font-semibold mb-3 text-blue-400">Frontend & Design</h5>
+                  <Folder 
+                    size={1.0} 
+                    color="#3b82f6" 
+                    className="mb-4"
+                    items={[
+                      // Jair Sánchez - Mobile Developer
                       <div 
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
-                        style={{ 
-                          backgroundImage: `url(${member.image})`,
-                          filter: 'brightness(0.8)'
+                        key={0}
+                        className="w-full h-full rounded-lg overflow-hidden cursor-pointer relative group"
+                        onClick={() => {
+                          const member = team[1]; // Jair
+                          if (member.portfolio && member.portfolio !== '#') {
+                            window.open(member.portfolio, '_blank');
+                          }
                         }}
-                      />
+                      >
+                        <div 
+                          className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-110"
+                          style={{ 
+                            backgroundImage: `url(${team[1].image})`,
+                            filter: 'brightness(0.9)'
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-1">
+                          <div className="text-white text-center">
+                            <p className="text-xs font-bold leading-tight">Jair</p>
+                            <p className="text-xs text-blue-400 leading-tight">Mobile</p>
+                          </div>
+                        </div>
+                        <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400" />
+                      </div>,
                       
-                      {/* Overlay con gradiente */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                      // Raúl Faz - Frontend Developer
+                      <div 
+                        key={1}
+                        className="w-full h-full rounded-lg overflow-hidden cursor-pointer relative group"
+                        onClick={() => {
+                          const member = team[3]; // Raúl
+                          if (member.portfolio && member.portfolio !== '#') {
+                            window.open(member.portfolio, '_blank');
+                          }
+                        }}
+                      >
+                        <div 
+                          className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-110"
+                          style={{ 
+                            backgroundImage: `url(${team[3].image})`,
+                            filter: 'brightness(0.9)'
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-1">
+                          <div className="text-white text-center">
+                            <p className="text-xs font-bold leading-tight">Raúl</p>
+                            <p className="text-xs text-blue-400 leading-tight">Frontend</p>
+                          </div>
+                        </div>
+                        <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-400" />
+                      </div>,
                       
-                      {/* Contenido */}
-                      <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                        <div className="transform transition-transform duration-300 group-hover:translate-y-[-10px]">
-                          <h3 className="text-2xl font-bold mb-2">{member.name}</h3>
-                          <p className="text-green-400 font-semibold mb-1">{member.specialty}</p>
-                          <p className="text-gray-300 text-sm mb-4">{member.role}</p>
-                          
-                          {member.portfolio !== '#' && (
-                            <div className="flex items-center gap-2 text-green-400 text-sm">
-                              <ArrowRight className="w-4 h-4" />
-                              <span>Ver portafolio</span>
-                            </div>
-                          )}
-                          
-                          {member.portfolio === '#' && (
-                            <div className="text-gray-400 text-sm">
-                              <span>Portafolio próximamente</span>
-                            </div>
-                          )}
+                      // Lesly Gaibor - UI/UX Designer
+                      <div 
+                        key={2}
+                        className="w-full h-full rounded-lg overflow-hidden cursor-pointer relative group"
+                        onClick={() => {
+                          const member = team[4]; // Lesly
+                          if (member.portfolio && member.portfolio !== '#') {
+                            window.open(member.portfolio, '_blank');
+                          }
+                        }}
+                      >
+                        <div 
+                          className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-110"
+                          style={{ 
+                            backgroundImage: `url(${team[4].image})`,
+                            filter: 'brightness(0.9)'
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-1">
+                          <div className="text-white text-center">
+                            <p className="text-xs font-bold leading-tight">Lesly</p>
+                            <p className="text-xs text-blue-400 leading-tight">UI/UX</p>
+                          </div>
+                        </div>
+                        <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400" />
+                      </div>
+                    ]}
+                  />
+                </div>
+                
+                {/* Carpeta Backend & QA */}
+                <div className="flex flex-col items-center">
+                  <h5 className="text-md font-semibold mb-3 text-purple-400">Backend & QA</h5>
+                  <Folder 
+                    size={1.0} 
+                    color="#8b5cf6" 
+                    className="mb-4"
+                    items={[
+                      // Josué Espinoza - Backend Developer
+                      <div 
+                        key={0}
+                        className="w-full h-full rounded-lg overflow-hidden cursor-pointer relative group"
+                        onClick={() => {
+                          const member = team[2]; // Josué Espinoza
+                          if (member.portfolio && member.portfolio !== '#') {
+                            window.open(member.portfolio, '_blank');
+                          }
+                        }}
+                      >
+                        <div 
+                          className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-110"
+                          style={{ 
+                            backgroundImage: `url(${team[2].image})`,
+                            filter: 'brightness(0.9)'
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-1">
+                          <div className="text-white text-center">
+                            <p className="text-xs font-bold leading-tight">Josué</p>
+                            <p className="text-xs text-purple-400 leading-tight">Backend</p>
+                          </div>
+                        </div>
+                        <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400" />
+                      </div>,
+                      
+                      // Josué Brazales - QA Tester
+                      <div 
+                        key={1}
+                        className="w-full h-full rounded-lg overflow-hidden cursor-pointer relative group"
+                        onClick={() => {
+                          const member = team[0]; // Josué Brazales
+                          if (member.portfolio && member.portfolio !== '#') {
+                            window.open(member.portfolio, '_blank');
+                          }
+                        }}
+                      >
+                        <div 
+                          className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-110"
+                          style={{ 
+                            backgroundImage: `url(${team[0].image})`,
+                            filter: 'brightness(0.9)'
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-1">
+                          <div className="text-white text-center">
+                            <p className="text-xs font-bold leading-tight">Josué</p>
+                            <p className="text-xs text-purple-400 leading-tight">QA</p>
+                          </div>
+                        </div>
+                        <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-400" />
+                      </div>,
+                      
+                      // Paper vacío para mantener estructura
+                      <div 
+                        key={2}
+                        className="w-full h-full rounded-lg overflow-hidden relative"
+                      >
+                        <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-800 rounded-lg flex items-center justify-center">
+                          <p className="text-xs text-gray-400 text-center">Más<br/>pronto</p>
                         </div>
                       </div>
-                      
-                      {/* Efecto de brillo en hover */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                    </div>
-                  </Card>
-                ))}
-              </CardSwap>
-            </div>
+                    ]}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
