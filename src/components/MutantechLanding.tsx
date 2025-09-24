@@ -182,6 +182,75 @@ const MutantechLanding = () => {
     } as LogoItem));
   };
 
+  // Estado para el carrusel automático (móvil)
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Tecnologías para el carrusel móvil
+  const getTechnologiesForCarousel = () => {
+    const baseUrl = 'https://res.cloudinary.com/dq8at3uoc/image/upload';
+    return [
+      { name: 'JavaScript', src: `${baseUrl}/v1758658967/javascript_anvpik.svg`, alt: 'JavaScript' },
+      { name: 'TypeScript', src: `${baseUrl}/v1758658997/typescript_t62nnw.svg`, alt: 'TypeScript' },
+      { name: 'React', src: isDarkMode ? `${baseUrl}/v1758658987/React_dark_wnxmlp.svg` : `${baseUrl}/v1758658990/React_light_jgqoyv.svg`, alt: 'React' },
+      { name: 'Node.js', src: `${baseUrl}/v1758658975/nodejs_trtdbc.svg`, alt: 'Node.js' },
+      { name: 'PHP', src: isDarkMode ? `${baseUrl}/v1758658981/Php_dark_plaq8j.svg` : `${baseUrl}/v1758658982/Php_light_m16uti.svg`, alt: 'PHP' },
+      { name: 'Java', src: `${baseUrl}/v1758658967/java_zklgre.svg`, alt: 'Java' },
+      { name: 'Python', src: `${baseUrl}/v1758658986/python_pdzovh.svg`, alt: 'Python' },
+      { name: 'Laravel', src: `${baseUrl}/v1758658971/laravel_v65ajo.svg`, alt: 'Laravel' },
+      { name: 'Spring Boot', src: `${baseUrl}/v1758658993/spring_qmkbyj.svg`, alt: 'Spring Boot' },
+      { name: 'Express.js', src: isDarkMode ? `${baseUrl}/v1758658953/Express.js_dark_zmf6l6.svg` : `${baseUrl}/v1758658954/Express.js_light_q2xdde.svg`, alt: 'Express.js' },
+      { name: 'Flask', src: isDarkMode ? `${baseUrl}/v1758658957/Flask_dark_omrfjs.svg` : `${baseUrl}/v1758658958/Flask_light_akmpib.svg`, alt: 'Flask' },
+      { name: 'MySQL', src: `${baseUrl}/v1758658977/mysql_aoysh6.svg`, alt: 'MySQL' },
+      { name: 'MongoDB', src: `${baseUrl}/v1758658972/mongodb_svjgdf.svg`, alt: 'MongoDB' },
+      { name: 'PostgreSQL', src: `${baseUrl}/v1758658983/postgresql_v4pub1.svg`, alt: 'PostgreSQL' },
+      { name: 'SQL Server', src: `${baseUrl}/v1758658994/sql-server_lbmlae.svg`, alt: 'SQL Server' },
+      { name: 'Docker', src: `${baseUrl}/v1758658952/docker_ph406u.svg`, alt: 'Docker' },
+      { name: 'Git', src: `${baseUrl}/v1758658961/git_lfab3b.svg`, alt: 'Git' },
+      { name: 'GitHub', src: isDarkMode ? `${baseUrl}/v1758658962/GitHub_dark_qyqj4q.svg` : `${baseUrl}/v1758658964/GitHub_light_qzcxwe.svg`, alt: 'GitHub' },
+      { name: 'VS Code', src: `${baseUrl}/v1758659008/vscode_hfnjzg.svg`, alt: 'VS Code' },
+      { name: 'Figma', src: `${baseUrl}/v1758658956/figma_qgnrg8.svg`, alt: 'Figma' },
+      { name: 'Tailwind CSS', src: `${baseUrl}/v1758658995/tailwindcss_jttn4r.svg`, alt: 'Tailwind CSS' },
+      { name: 'Bootstrap', src: `${baseUrl}/v1758658947/bootstrap_of2rkf.svg`, alt: 'Bootstrap' },
+      { name: 'HTML5', src: `${baseUrl}/v1758658965/html5_o7degc.svg`, alt: 'HTML5' },
+      { name: 'CSS3', src: `${baseUrl}/v1758658949/css_old_qtdvg4.svg`, alt: 'CSS3' },
+      { name: 'Angular', src: `${baseUrl}/v1758658946/angular_gpqdyb.svg`, alt: 'Angular' },
+      { name: 'Flutter', src: `${baseUrl}/v1758658960/flutter_pfpv4x.svg`, alt: 'Flutter' },
+      { name: 'Dart', src: `${baseUrl}/v1758658950/dart_s3osol.svg`, alt: 'Dart' },
+      { name: 'Android', src: `${baseUrl}/v1758658945/android-icon_flenrr.svg`, alt: 'Android' },
+      { name: 'Vite', src: `${baseUrl}/v1758659006/vitejs_w3t0f4.svg`, alt: 'Vite' },
+      { name: 'Vercel', src: isDarkMode ? `${baseUrl}/v1758659003/Vercel_dark_g8pdja.svg` : `${baseUrl}/v1758659004/Vercel_light_xbbrtn.svg`, alt: 'Vercel' },
+      { name: 'Postman', src: `${baseUrl}/v1758658986/postman_h8ngia.svg`, alt: 'Postman' },
+      { name: 'NPM', src: `${baseUrl}/v1758658978/npm_rumf4p.svg`, alt: 'NPM' },
+      { name: 'JWT', src: `${baseUrl}/v1758658970/jwt_xrpiqh.svg`, alt: 'JWT' },
+      { name: 'Cloudinary', src: `${baseUrl}/v1758658948/cloudinary_gkpqok.svg`, alt: 'Cloudinary' },
+      { name: 'Canva', src: `${baseUrl}/v1758658948/canva_rftjed.svg`, alt: 'Canva' },
+      { name: 'Notion', src: `${baseUrl}/v1758658976/notion_helaep.svg`, alt: 'Notion' },
+      { name: 'UI/UX', src: isDarkMode ? `${baseUrl}/v1758658999/ui_dark_cdzrbp.svg` : `${baseUrl}/v1758659001/ui_light_thi24l.svg`, alt: 'UI/UX Design' }
+    ];
+  };
+
+  // Dividir tecnologías en grupos de 3 para el carrusel
+  const techSlides = () => {
+    const technologies = getTechnologiesForCarousel();
+    const slides = [];
+    for (let i = 0; i < technologies.length; i += 3) {
+      slides.push(technologies.slice(i, i + 3));
+    }
+    return slides;
+  };
+
+  // Hook para el carrusel automático (solo móvil)
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    const slides = techSlides();
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 3000); // Cambia cada 3 segundos
+
+    return () => clearInterval(interval);
+  }, [isMobile, isDarkMode]); // Incluir isDarkMode para actualizar cuando cambie el tema
+
   // Sistema de colores para ambos temas (corregido)
   const getThemeClasses = () => {
     if (isDarkMode) {
@@ -646,20 +715,44 @@ const MutantechLanding = () => {
           </div>
           
           <div className="relative" data-aos="fade-up" data-aos-delay="200">
-            <div className={`${isMobile ? 'h-24' : 'h-32'} relative overflow-hidden rounded-lg ${isMobile ? 'px-2' : ''}`}>
-              <LogoLoop
-                logos={getAdditionalTechnologyLogos()}
-                speed={isMobile ? 40 : 50}
-                direction="left"
-                logoHeight={isMobile ? 36 : 56}
-                gap={isMobile ? 64 : 56}
-                pauseOnHover={true}
-                fadeOut={!isMobile}
-                fadeOutColor={isDarkMode ? '#111827' : '#f9fafb'}
-                scaleOnHover={!isMobile}
-                ariaLabel="Tecnologías adicionales que utilizamos"
-                className="h-full"
-              />
+            <div className={`${isMobile ? 'h-32' : 'h-32'} relative overflow-hidden rounded-lg ${isMobile ? 'px-2' : ''}`}>
+              {isMobile ? (
+                /* Carrusel automático para móvil con loop infinito */
+                <div className="tech-carousel-container">
+                  <div className="tech-carousel-track">
+                    {/* Duplicar las tecnologías para efecto infinito */}
+                    {[...getTechnologiesForCarousel(), ...getTechnologiesForCarousel()].map((tech, index) => (
+                      <div 
+                        key={`tech-${index}`}
+                        className={`${theme.card} ${theme.cardHover} rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 transform hover:scale-105 flex-shrink-0 w-20`}
+                      >
+                        <img 
+                          src={tech.src} 
+                          alt={tech.alt}
+                          className="w-8 h-8 object-contain mb-2"
+                          loading="lazy"
+                        />
+                        <span className="text-xs font-medium text-center leading-tight">{tech.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* LogoLoop para desktop */
+                <LogoLoop
+                  logos={getAdditionalTechnologyLogos()}
+                  speed={50}
+                  direction="left"
+                  logoHeight={56}
+                  gap={56}
+                  pauseOnHover={true}
+                  fadeOut={true}
+                  fadeOutColor={isDarkMode ? '#111827' : '#f9fafb'}
+                  scaleOnHover={true}
+                  ariaLabel="Tecnologías adicionales que utilizamos"
+                  className="h-full"
+                />
+              )}
             </div>
             
             {/* Tooltip para mostrar nombre de tecnología */}
